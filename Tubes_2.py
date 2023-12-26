@@ -45,20 +45,27 @@ database = {
             'harga' : 7000
         }
     },
-    'tiket_terjual' : {
-        'tv_girl' : 5,
-        'grrl_gen' : 10
+    'tiket' : {
+        'stok' : {
+            'tv_girl' : 100,
+            'grrl_gen' : 90
+        }
     },
     'pembeli' : {
         'tv_girl' : {
             'nama' : ['haikal', 'luna'],
-            'tanggal' : [150, 150]
+            'tanggal' : [150, 150],
+            'pesawat' : [3000, 2500],
+            'seat' : [3, 3],
+            'jumlah' : [5, 10]
         },
         'grrl_gen' : {
             'nama' : ['aulia', 'ali'],
-            'tanggal' : [300, 300]
+            'tanggal' : [300, 300],
+            'pesawat' : [2500, 2000],
+            'seat' : [2, 3],
+            'jumlah' : [5, 10]
         }
-
     }
 }
 
@@ -166,6 +173,13 @@ class Manager(Aplikasi):
             return False
         database[kategori_1][kategori_2][key] = value
         return True
+    
+    def tambah_data(self, cari_kategori, kategori_1, kategori_2, key, value):
+        if cari_kategori in database[kategori_1]:
+            database[kategori_1][kategori_2].update({key : value})
+            print('Data Telah Ditambahkan !')
+        else:
+            print('Data Tidak Berhasil Ditambahkan')
 
     def penerbangan(self):
         print('Pilih Opsi: ')
@@ -187,9 +201,15 @@ class Manager(Aplikasi):
         opsi = int(input('Opsi Kamu: '))
 
         if opsi == 1:
-            pass
+            print('Tolong Isi Data Dibawah Ini')
+            seat_baru = input('Jenis Seat Baru: ')
+            harga_baru = int(input('Harga Seat Baru: '))
+            self.tambah_data('seat', 'penerbangan', 'seat', seat_baru, harga_baru)
         elif opsi == 2:
-            pass
+            print('Tolong Isi Data Dibawah Ini')
+            rute_baru = input('Kota Baru: ')
+            harga_baru = int(input('Biaya Penerbangan: '))
+            self.tambah_data('rute', 'penerbangan', 'rute', rute_baru, seat_baru)
         else:
             print('Harap Pilih Opsi Yang Ada')
 
@@ -212,6 +232,46 @@ class Manager(Aplikasi):
         else:
             print('Harap Pilih Opsi Yang Ada')
 
+    def ganti_harga(self):
+        print('Band\tHarga')
+        for band in database['armada']:
+            for key, value in database['armada'][band].items():
+                if key == 'harga':
+                    print(f'{key}\t{value}')
+        print('Masukkan Band Yang Ingin Diganti Harganya:')
+        band = input('Nama Band: ')
+        harga_baru = int(input('Harga Baru: '))
+        self.ganti_data('armada', 'arbada', band, 'harga', harga_baru)
+
+    def tampil_data_penerbangan(self):
+        print('Rute\tHarga')
+        self.tambah_data('penerbangan', 'rute')
+    
+    def tampil_data_band(self):
+        print('Band\tVocal\tGuitarist\tDrummer\tHarga Panggung')
+        for band, personil in database['armada'].items():
+            vocal, gitar, drum, harga = personil
+            print(f'{band}\t{vocal}\t{gitar}\t{drum}\t{harga}')
+
+    def tampil_tiket(self):
+        print('Band\tTiket Terjual')
+        for key, value in database['tiket_terjual']['stok'].items():
+            print(f'{key}\t{value}')
+        
+    def tampil_daftar_pembeli(self):
+        print('Nama\tBand\tTanggal\tjumlah')
+        for band, detil in database['pembeli'].items():
+            nama, tanggal, pesawat, seat, jumlah = detil
+            print(f'{nama}\t{band}\t{tanggal}\t{jumlah}')
+    
+    def tampil_penjualan_sisa(self):
+        print('Band\tKeuntungan')
+        for band, detil in database['pembeli'].items():
+            nama, tanggal, pesawat, seat, jumlah = detil
+            total = database[pembeli][band][pesawat] * database[pembeli][band][seat] * database[pembeli][band][jumlah]
+
+            print(f'{band}\t{total}')
+            
 class Pembeli(Aplikasi):
     def __init__(self, username, name, password, pengguna):
         super().__init__(username, name, password, pengguna)
