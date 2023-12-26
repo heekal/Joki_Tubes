@@ -19,35 +19,46 @@ pembeli = {
 
 database = {
     'penerbangan' : {
-        'bandung' : 1000,
-        'jakarta' : 2000,
-        'surabaya' : 1000, 
-        'pekanbaru' : 500},
+        'seat' : {
+            'regular' : 1,
+            'premium' : 2,
+            'firstclass': 3
+        }, 
+        'rute' : {
+            'bandung' : 1000,
+            'jakarta' : 2000,
+            'surabaya' : 1000, 
+            'pekanbaru' : 500
+        }
+    },
     'armada' : {
         'tv_girl' : {
             'vocal' : 'alex',
             'guitarist' : 'mark',
-            'drummer' : 'john'
+            'drummer' : 'john',
+            'harga' : 5000
         },
         'grrl_gen' : {
             'vocal' : 'maudy',
             'guitarist' : 'djadjat',
-            'dummer' : 'sucipto'
+            'dummer' : 'sucipto',
+            'harga' : 7000
         }
     },
-    'harga' : {
-        'regular' : 1,
-        'premium' : 2,
-        'firstclass': 3
-    },
     'tiket_terjual' : {
-        # cara isinya misal :
-        # tv girl : 3
+        'tv_girl' : 5,
+        'grrl_gen' : 10
     },
     'pembeli' : {
-        'nama' : [],
-        'tiket' : [],
-        'tanggal' : []
+        'tv_girl' : {
+            'nama' : ['haikal', 'luna'],
+            'tanggal' : [150, 150]
+        },
+        'grrl_gen' : {
+            'nama' : ['aulia', 'ali'],
+            'tanggal' : [300, 300]
+        }
+
     }
 }
 
@@ -78,7 +89,6 @@ class Aplikasi:
         else:
             return False
         
-
 class Admin(Aplikasi):
     def __init__(self, username, name, password, pengguna):
         super().__init__(username, name, password, pengguna)
@@ -130,6 +140,90 @@ class Admin(Aplikasi):
                 print('Data Telah Dihapus!')
         else:
             print('Data Tidak Ditemukan !')
+
+class Manager(Aplikasi):
+    def __init__(self, username, name, password, pengguna):
+        super().__init__(username, name, password, pengguna)
+    
+    def main_menu(self):
+        print('Pilih Opsi:')
+        print('1. Tambah/Edit Data Penerbangan')
+        print('2. Tambah/Edit Data Armada')
+        print('3. Ubah Harga Tiket')
+        print('4. Tampilkan Data Penerbangan')
+        print('5. Tampikan Data Armada')
+        print('6. Tampilkan Tiket Terjual')
+        print('7. Tampilkan Daftar Pembeli')
+        print('8. Tampilkan Total Penjualan dan Sisa Tiket')
+        print('9. Keluar')
+
+    def tampil_data(self, kategori_1, kategori_2):
+        for key, value in database[kategori_1][kategori_2].items():
+            print(f'{key}\t{value}')
+
+    def ganti_data(self, cari_kategori , kategori_1, kategori_2, key, value):
+        if cari_kategori in database[kategori_1] and key not in database[kategori_1][kategori_2]:
+            return False
+        database[kategori_1][kategori_2][key] = value
+        return True
+
+    def penerbangan(self):
+        print('Pilih Opsi: ')
+        print('1. Tambah Data')
+        print('2. Edit Data')
+        opsi = int(input('Pilihan Kamu: '))
+
+        if opsi == 1:
+            self.tambah_data_penerbangan()
+        elif opsi == 2:
+            self.edit_data_penerbangan()
+        else:
+            print('Harap Pilih Opsi Yang Ada')
+
+    def tambah_data_penerbangan(self):
+        print('Harap Isi Data Berikut')
+        print('1. Tambah Data Seat')
+        print('2. Tambah Data Rute')
+        opsi = int(input('Opsi Kamu: '))
+
+        if opsi == 1:
+            pass
+        elif opsi == 2:
+            pass
+        else:
+            print('Harap Pilih Opsi Yang Ada')
+
+    def edit_data_penerbangan(self):
+        print('Harap Isi Data Berikut')
+        print('1. Ganti Data Seat')
+        print('2. Ganti Data Rute')
+        opsi = int(input('Opsi Kamu: '))
+
+        if opsi == 1:
+            self.tampil_data('penerbangan', 'seat')
+            key = input('Seat Yang Ingin Diganti: ')
+            value = int(input('Harga Seat Yang Baru: '))
+            self.ganti_data('seat', 'penerbangan', 'seat', key, value)
+        elif opsi == 2:
+            self.tampil_data('penerbangan', 'rute')
+            key = input('Seat Yang Ingin Diganti: ')
+            value = int(input('Harga Seat Yang Baru: '))
+            self.ganti_data('rute', 'penerbangan', 'rute', key, value)
+        else:
+            print('Harap Pilih Opsi Yang Ada')
+
+class Pembeli(Aplikasi):
+    def __init__(self, username, name, password, pengguna):
+        super().__init__(username, name, password, pengguna)
+
+    def main_menu(self):
+        print('Pilih Opsi')
+        print('1. Tampilkan Daftar Penerbangan')
+        print('2. Tampilkan Daftar Tiket')
+        print('3. Cari penerbangan')
+        print('4. Cari Tiket')
+        print('5. Pesan Tiket')
+        print('6. Keluar')
 
 aplikasi = Aplikasi('', '', '', '')
 username, name, password,  = aplikasi.login(admin)
