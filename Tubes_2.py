@@ -47,21 +47,27 @@ database = {
     },
     'tiket' : {
         'stok' : {
-            'tv_girl' : 100,
-            'grrl_gen' : 90
+            'tv_girl' : {
+                150 : 10,
+                151 : 10
+            },
+            'grrl_gen' : {
+                140 : 10,
+                141 : 10
+            }
         }
     },
     'pembeli' : {
         'tv_girl' : {
             'nama' : ['haikal', 'luna'],
-            'tanggal' : [150, 150],
+            'tanggal' : [150, 151],
             'pesawat' : [3000, 2500],
             'seat' : [3, 3],
-            'jumlah' : [5, 10]
+            'jumlah' : [5, 5]
         },
         'grrl_gen' : {
             'nama' : ['aulia', 'ali'],
-            'tanggal' : [300, 300],
+            'tanggal' : [140, 141],
             'pesawat' : [2500, 2000],
             'seat' : [2, 3],
             'jumlah' : [5, 10]
@@ -76,6 +82,12 @@ class Aplikasi:
         self._password = password   # isinya password username
         self.pengguna = pengguna    # isinya jenis pengguna, admin, manager, pembeli
     
+    def main_menu(self):
+        print('Login Sebagai: ')
+        print('1. Admin')
+        print('2. Manager')
+        print('3. Pembeli')
+
     def userlogin(self):
         username = input('Masukkan Username: ')
         password = input('Masukkan Password: ')
@@ -89,12 +101,31 @@ class Aplikasi:
         else:
             return '', '', ''
     
-    def verifikasi(self, pengguna):
-        username, name, passowrd = self.login(pengguna)
-        if username != '' and name != '' and passowrd !='':
+    def verifikasi(self, username, name, password):
+        if username != '' and name != '' and password !='':
             return True
         else:
             return False
+    
+    def ubah_tanggal(self, jenis, tanggal):
+        if jenis == 'dd/mm':
+            hari, bulan = map(int, tanggal.split('/'))
+            tanggal_per_bulan = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            if bulan < 1 or bulan > 12 or hari < 1 or hari > tanggal_per_bulan[bulan]:
+                return 0
+            
+            hasil = sum(tanggal_per_bulan[:bulan]) + hari
+            return hasil
+        elif jenis == '365':
+            tanggal_per_bulan = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            if tanggal < 1 or tanggal > 365:
+                return 0
+            bulan = 1
+            while tanggal > tanggal_per_bulan[bulan]:
+                tanggal -= tanggal_per_bulan[bulan]
+                bulan += 1
+            hasil = tanggal
+            return f'{hasil:02d}/{bulan:02d}'
         
 class Admin(Aplikasi):
     def __init__(self, username, name, password, pengguna):
@@ -113,10 +144,6 @@ class Admin(Aplikasi):
             self.edit_data()
         elif opsi == 3:
             self.hapus_data()
-    
-    def admin_login(self):
-        print('Harap Masuk Menggunakan Akun Kamu : ')
-        self.verifikasi(self.pengguna)
 
     def tambah_data(self):
         print('Masukkan Data Manager Yang Mau Ditambah: ')
@@ -163,6 +190,25 @@ class Manager(Aplikasi):
         print('7. Tampilkan Daftar Pembeli')
         print('8. Tampilkan Total Penjualan dan Sisa Tiket')
         print('9. Keluar')
+        
+        pilihan = int(input('Masukkan Pilihan Kamu: '))
+
+        if pilihan == 1:
+            self.penerbangan()
+        elif pilihan == 2:
+            self.armada()
+        elif pilihan == 3:
+            self.ganti_data()
+        elif pilihan == 4:
+            self.tampil_data_penerbangan()
+        elif pilihan == 5:
+            self.tampil_data_band()
+        elif pilihan == 6:
+            self.tampil_tiket_terjual()
+        elif pilihan == 7:
+            self.tampil_daftar_pembeli()
+        elif pilihan == 8:
+            self.tampil_penjualan_sisa()
 
     def tampil_data(self, kategori_1, kategori_2):
         for key, value in database[kategori_1][kategori_2].items():
@@ -209,7 +255,7 @@ class Manager(Aplikasi):
             print('Tolong Isi Data Dibawah Ini')
             rute_baru = input('Kota Baru: ')
             harga_baru = int(input('Biaya Penerbangan: '))
-            self.tambah_data('rute', 'penerbangan', 'rute', rute_baru, seat_baru)
+            self.tambah_data(rute_baru, 'penerbangan', 'rute', rute_baru, seat_baru)
         else:
             print('Harap Pilih Opsi Yang Ada')
 
@@ -232,6 +278,21 @@ class Manager(Aplikasi):
         else:
             print('Harap Pilih Opsi Yang Ada')
 
+    def armada(self):
+        print('Pilih Opsi: ')
+        print('1. Tambah Data')
+        print('2. Edit Data')
+        opsi = int(input('Pilihan Kamu: '))
+
+        if opsi == 1:
+            self.tambah_data_armada()
+        elif opsi == 2:
+            self.edit_data_armada()
+        else:
+            print('Harap Pilih Opsi Yang Ada')
+
+    def tambah_data_armada(self):
+        
     def ganti_harga(self):
         print('Band\tHarga')
         for band in database['armada']:
@@ -241,7 +302,7 @@ class Manager(Aplikasi):
         print('Masukkan Band Yang Ingin Diganti Harganya:')
         band = input('Nama Band: ')
         harga_baru = int(input('Harga Baru: '))
-        self.ganti_data('armada', 'arbada', band, 'harga', harga_baru)
+        self.ganti_data('armada', 'armada', band, 'harga', harga_baru)
 
     def tampil_data_penerbangan(self):
         print('Rute\tHarga')
@@ -253,24 +314,33 @@ class Manager(Aplikasi):
             vocal, gitar, drum, harga = personil
             print(f'{band}\t{vocal}\t{gitar}\t{drum}\t{harga}')
 
-    def tampil_tiket(self):
-        print('Band\tTiket Terjual')
-        for key, value in database['tiket_terjual']['stok'].items():
-            print(f'{key}\t{value}')
+    def tampil_tiket_terjual(self):
+        print('Band\tTanggal\tTiket Terjual')
+        for band, days in database['tiket']['stok'].items():
+            for day, tickets_sold in days.items():
+                print(f'{band}\t{day}\t{tickets_sold}')
         
     def tampil_daftar_pembeli(self):
-        print('Nama\tBand\tTanggal\tjumlah')
+        print('Nama\tBand\tTanggal\tJumlah')
         for band, detil in database['pembeli'].items():
-            nama, tanggal, pesawat, seat, jumlah = detil
-            print(f'{nama}\t{band}\t{tanggal}\t{jumlah}')
-    
+            for i in range(len(detil['nama'])):
+                nama = detil['nama'][i]
+                tanggal = detil['tanggal'][i]
+                jumlah = detil['jumlah'][i]
+                print(f'{nama}\t{band}\t{tanggal}\t{jumlah}')
+
     def tampil_penjualan_sisa(self):
         print('Band\tKeuntungan')
         for band, detil in database['pembeli'].items():
-            nama, tanggal, pesawat, seat, jumlah = detil
-            total = database[pembeli][band][pesawat] * database[pembeli][band][seat] * database[pembeli][band][jumlah]
+            for i in range(len(detil['nama'])):
+                nama = detil['nama'][i]
+                tanggal = detil['tanggal'][i]
+                pesawat = detil['pesawat'][i]
+                seat = detil['seat'][i]
+                jumlah = detil['jumlah'][i]
 
-            print(f'{band}\t{total}')
+                total = database['tiket']['stok'][band][tanggal] * database['penerbangan']['rute'][pesawat] * database['penerbangan']['seat'][seat] * jumlah
+                print(f'{band}\t{total}')
             
 class Pembeli(Aplikasi):
     def __init__(self, username, name, password, pengguna):
@@ -285,8 +355,86 @@ class Pembeli(Aplikasi):
         print('5. Pesan Tiket')
         print('6. Keluar')
 
+    def tampil_daftar(self, cari):
+        tipe = cari
+        for tipe_item, keterangan_item in database[cari].items():
+            nama = tipe_item
+            keterangan = ', '.join([str(item) for item in keterangan_item.keys()])
+            harga = ', '.join([str(item) for item in keterangan_item.values()])
+            print(f'{tipe}\t{nama}\t{keterangan}\t{harga}')
+
+    def cari_item(self, cari, tipe):
+        if cari in database['penerbangan'][tipe]:
+            return database['penerbangan'][tipe][cari]
+        else:
+            return '0'
+        
+    def login(self):
+        print('Harap Masuk Menggunakan Akun Kamu : ')
+        self.verifikasi(self.pengguna)
+
+    def tampilkan_daftar_dan_cari_penerbangan(self):
+        print('Jenis\tKeterangan\tHarga')
+        self.tampil_daftar('penerbangan')
+        cari = input('Silakan Masukkan Jenis Yang Ingin dicari harganya: ') # Isinya Seat Atau Rute
+        keterangan = input('Silakan Masukkan Keteranan Yang Ingin Dicari: ')
+        if self.cari_item(cari, keterangan) != '0':
+            print('Harganya adalah: ', self.cari_item(cari, keterangan))
+        else:
+            print('Silakan Cari Dari Pilihan Yang Ada')
+
+    def tampilkan_daftar_dan_cari_tiket(self):
+        print('Band\tTanggal\tHarga')
+        self.tampil_daftar('armada')
+        cari = input('Silakan Masukkan Band Yang Ingin Anda Cari: ') # Isinya Tv_Girl Atau Grrl Gen
+        keterangan = input('Silakan Masukkan Member Yang Ingin Anda Cari: ')
+        if self.cari_item(cari, keterangan) != '0':
+            print(f'{keterangan} : {self.cari_item(cari,keterangan)}')  
+        else:
+            print('Silakan Cari Dari Pilihan Yang Ada')      
+
+    def pesan_tiket(self):
+        print('Silakan Isi Data Berikut: ')
+        nama = input('Masukkan Nama Anda: ')
+        band = input('Masukkan Nama Band Yang Ingin Ditonton: ')
+        tanggal = input('Masukkan Tanggal Format dd/mm : ')
+        asal = input('Masukkan Kota Asal: ')
+        tujuan = input('Masukkan Kota Tujuan: ')
+        kursi = input('Masukkan Jenis Kursi Pesawat: ')
+        jumlah = int(input('Masukkan Tiket Yang Dibeli: '))
+        fix = input('Apakah Sudah Sesuai (y/n) ? ')
+    
+        if fix == 'y':
+            biaya = database['penerbangan']['rute'][asal] + database['penerbangan']['rute'][tujuan]
+            if kursi in database['penerbangan']['seat']:
+                kelas =  database['penerbangan']['seat'][kursi]
+            hari = self.ubah_tanggal('dd/mm', tanggal)
+            database['pembeli'][band]['nama'].appned(nama)
+            database['pembeli'][band]['tanggal'].apend(hari)
+            database['pembeli'][band]['pesawat'].append(biaya)
+            database['pembeli'][band]['seat'].append(kelas)
+            database['pembeli'][band]['jumlah'].append(jumlah)
+
+
 aplikasi = Aplikasi('', '', '', '')
 username, name, password,  = aplikasi.login(admin)
 
-haikal = Admin(username, name, password, admin)
-haikal.main_menu()
+start = True
+while start == True:
+    aplikasi.main_menu()
+    opsi = int(input('Masukkan Pilihan Anda: '))
+
+    if opsi == 1:
+        username_admin, nama_admin, password_admin = aplikasi.login(admin)
+        while aplikasi.verifikasi(username_admin, nama_admin, password_admin):
+            admin = Admin(username_admin, nama_admin, password_admin, admin)
+            admin.main_menu()
+
+    elif opsi == 2:
+        username_manager, nama_manager, password_manager = aplikasi.login(manager)
+        while aplikasi.verifikasi(username_manager, nama_manager, password_manager):
+            manager = Manager(username_manager, nama_manager, password_manager, manager)
+            manager.main_menu()
+            
+    elif opsi == 3:
+        pass
