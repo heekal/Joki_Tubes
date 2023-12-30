@@ -136,6 +136,7 @@ class Admin(Aplikasi):
         print('1. Tambah Manager')
         print('2. Edit Manager')
         print('3. Hapus Manger')
+        print('4. Keluar')
         opsi = int(input('Pilihan Kamu: '))
 
         if opsi == 1:
@@ -144,6 +145,8 @@ class Admin(Aplikasi):
             self.edit_data()
         elif opsi == 3:
             self.hapus_data()
+        else:
+            return False
 
     def tambah_data(self):
         print('Masukkan Data Manager Yang Mau Ditambah: ')
@@ -157,7 +160,7 @@ class Admin(Aplikasi):
         for indeks, username_stored, in enumerate(manager['username']):
             if username == username_stored:
                 manager['username'][indeks] = input('Masukkan Username Baru: ')
-                manager['name'][indeks] = input('Masukkan Nama Pengguna Baru: ')
+                manager['name'][indeks] = input('Masukkan Nama Manager Baru: ')
                 manager['password'][indeks] = input('Masukkan Password Baru: ')
                 print('Data Berhasil Diganti !')
         else:
@@ -209,6 +212,8 @@ class Manager(Aplikasi):
             self.tampil_daftar_pembeli()
         elif pilihan == 8:
             self.tampil_penjualan_sisa()
+        else:
+            return False
 
     def tampil_data(self, kategori_1, kategori_2):
         for key, value in database[kategori_1][kategori_2].items():
@@ -292,7 +297,43 @@ class Manager(Aplikasi):
             print('Harap Pilih Opsi Yang Ada')
 
     def tambah_data_armada(self):
-        
+        print('Tolong Isi Data Dibawah Ini: ')
+        band_baru = input("Masukkan Nama Band Yang Dipisah Oleh Underscore '_' : ")
+        vocalist = input('Masukkan Nama Vokalist : ')
+        guitarist = input('Masukkan Nama Guitarist : ')
+        drummer = input('Masukkan Nama Drummer : ')
+        harga = int(input('Masukkan Harga Panggung : '))
+
+        verif = input('Data Telah Sesuai (y/n) : ')
+        if verif == 'y':
+            database['armada'][band_baru] = {
+                'vocal': vocalist,
+                'guitarist': guitarist,
+                'drummer': drummer,
+                'harga': harga
+            }
+        else:
+            self.tambah_data_armada()
+
+    def edit_data_armada(self):
+        print('Tolong Isi Data Dibawah Ini: ')
+        band = input("Masukkan Nama Band Yang Dipisah Oleh Underscore '_' : ")
+        vocalist = input('Masukkan Nama Vokalist : ')
+        guitarist = input('Masukkan Nama Guitarist : ')
+        drummer = input('Masukkan Nama Drummer : ')
+        harga = int(input('Masukkan Harga Panggung : '))
+
+        verif = input('Data Telah Sesuai (y/n) : ')
+        if verif == 'y' and band in database['armada']:
+            database['armada'][band] = {
+                'vocal': vocalist,
+                'guitarist': guitarist,
+                'drummer': drummer,
+                'harga': harga
+            }
+        else:
+            print('Band Tidak Ditemukan !')
+
     def ganti_harga(self):
         print('Band\tHarga')
         for band in database['armada']:
@@ -306,12 +347,12 @@ class Manager(Aplikasi):
 
     def tampil_data_penerbangan(self):
         print('Rute\tHarga')
-        self.tambah_data('penerbangan', 'rute')
+        self.tampil_data_data('penerbangan', 'rute')
     
     def tampil_data_band(self):
         print('Band\tVocal\tGuitarist\tDrummer\tHarga Panggung')
         for band, personil in database['armada'].items():
-            vocal, gitar, drum, harga = personil
+            vocal, gitar, drum, harga = personil['vocal'], personil['guitarist'], personil['drummer'], personil['harga']
             print(f'{band}\t{vocal}\t{gitar}\t{drum}\t{harga}')
 
     def tampil_tiket_terjual(self):
@@ -348,13 +389,21 @@ class Pembeli(Aplikasi):
 
     def main_menu(self):
         print('Pilih Opsi')
-        print('1. Tampilkan Daftar Penerbangan')
-        print('2. Tampilkan Daftar Tiket')
-        print('3. Cari penerbangan')
-        print('4. Cari Tiket')
-        print('5. Pesan Tiket')
-        print('6. Keluar')
+        print('1. Tampilkan Dan Cari Penerbangan')
+        print('2. Tampilkan Dan Cari Tiket')
+        print('3. Pesan Tiket')
+        print('4. Keluar')  
+        opsi = int(input('Masukkan Pilihan Kamu: '))
 
+        if opsi == 1:
+            self.tampil_daftar_dan_cari_penerbangan()
+        elif opsi == 2:
+            self.tampil_daftar_dan_cari_tiket()
+        elif opsi == 3:
+            self.pesan_tiket()
+        elif opsi == 4:
+            return False
+        
     def tampil_daftar(self, cari):
         tipe = cari
         for tipe_item, keterangan_item in database[cari].items():
@@ -373,25 +422,25 @@ class Pembeli(Aplikasi):
         print('Harap Masuk Menggunakan Akun Kamu : ')
         self.verifikasi(self.pengguna)
 
-    def tampilkan_daftar_dan_cari_penerbangan(self):
+    def tampil_daftar_dan_cari_penerbangan(self):
         print('Jenis\tKeterangan\tHarga')
         self.tampil_daftar('penerbangan')
-        cari = input('Silakan Masukkan Jenis Yang Ingin dicari harganya: ') # Isinya Seat Atau Rute
+        cari = input('Silakan Masukkan Jenis Yang Ingin dicari harganya: ')  # Isinya Seat Atau Rute
         keterangan = input('Silakan Masukkan Keteranan Yang Ingin Dicari: ')
         if self.cari_item(cari, keterangan) != '0':
             print('Harganya adalah: ', self.cari_item(cari, keterangan))
         else:
             print('Silakan Cari Dari Pilihan Yang Ada')
 
-    def tampilkan_daftar_dan_cari_tiket(self):
+    def tampil_daftar_dan_cari_tiket(self):
         print('Band\tTanggal\tHarga')
         self.tampil_daftar('armada')
-        cari = input('Silakan Masukkan Band Yang Ingin Anda Cari: ') # Isinya Tv_Girl Atau Grrl Gen
+        cari = input('Silakan Masukkan Band Yang Ingin Anda Cari: ')  # Isinya Tv_Girl Atau Grrl Gen
         keterangan = input('Silakan Masukkan Member Yang Ingin Anda Cari: ')
         if self.cari_item(cari, keterangan) != '0':
-            print(f'{keterangan} : {self.cari_item(cari,keterangan)}')  
+            print(f'{keterangan} : {self.cari_item(cari, keterangan)}')
         else:
-            print('Silakan Cari Dari Pilihan Yang Ada')      
+            print('Silakan Cari Dari Pilihan Yang Ada')     
 
     def pesan_tiket(self):
         print('Silakan Isi Data Berikut: ')
@@ -402,7 +451,7 @@ class Pembeli(Aplikasi):
         tujuan = input('Masukkan Kota Tujuan: ')
         kursi = input('Masukkan Jenis Kursi Pesawat: ')
         jumlah = int(input('Masukkan Tiket Yang Dibeli: '))
-        fix = input('Apakah Sudah Sesuai (y/n) ? ')
+        fix = input('Apakah Sudah Sesuai (y/n) ? ') 
     
         if fix == 'y':
             biaya = database['penerbangan']['rute'][asal] + database['penerbangan']['rute'][tujuan]
@@ -437,4 +486,7 @@ while start == True:
             manager.main_menu()
             
     elif opsi == 3:
-        pass
+        username_buyer, nama_buyer, password_buyer = aplikasi.login(pembeli)
+        while aplikasi.verifikasi(username_buyer, nama_buyer, password_buyer):
+            buyer = Pembeli(username_buyer, nama_buyer, password_buyer, pembeli)
+            buyer.main_menu()
