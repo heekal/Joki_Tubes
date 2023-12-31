@@ -106,6 +106,13 @@ class Aplikasi:
             return True
         else:
             return False
+        
+    def buat_akun(self):
+        print('Harap Isi Data Dibawah Ini :')
+        pembeli['username'].append(input('Username : '))
+        pembeli['name'].append(input('Nama : '))
+        pembeli['password'].append(input('Password: '))
+        print('Data Behasil Di Tambahkan !')
     
     def ubah_tanggal(self, jenis, tanggal):
         if jenis == 'dd/mm':
@@ -367,13 +374,15 @@ class Pembeli(Aplikasi):
         tipe = cari
         for tipe_item, keterangan_item in database[cari].items():
             nama = tipe_item
-            keterangan = ', '.join([str(item) for item in keterangan_item.keys()])
-            harga = ', '.join([str(item) for item in keterangan_item.values()])
-            print(f'{tipe}\t{nama}\t{keterangan}\t{harga}')
+            keterangan = list(keterangan_item.keys())
+            harga = list(keterangan_item.values())
+            print(f'{nama}')
+            for i in range(len(keterangan)):
+                print(f'.\t{keterangan[i]}\{harga[i]}')
 
-    def cari_item(self, cari, tipe):
-        if cari in database['penerbangan'][tipe]:
-            return database['penerbangan'][tipe][cari]
+    def cari_item(self, data, cari, tipe):
+        if tipe in database[data][cari]:
+            return database[data][cari][tipe]
         else:
             return '0'
         
@@ -382,12 +391,12 @@ class Pembeli(Aplikasi):
         self.verifikasi(self.pengguna)
 
     def tampil_daftar_dan_cari_penerbangan(self):
-        print('Jenis\tKeterangan\tHarga')
+        print('Jenis\tJenis\tKeterangan')
         self.tampil_daftar('penerbangan')
-        cari = input('Silakan Masukkan Jenis Yang Ingin dicari harganya: ')  # Isinya Seat Atau Rute
-        keterangan = input('Silakan Masukkan Keteranan Yang Ingin Dicari: ')
-        if self.cari_item(cari, keterangan) != '0':
-            print('Harganya adalah: ', self.cari_item(cari, keterangan))
+        cari = input('Silakan Masukkan Jenis Yang Ingin dicari lebih lanjut: ')  # Isinya Seat Atau Rute
+        keterangan = input('Silakan Masukkan Keterangan Yang Ingin Dicari: ')
+        if self.cari_item('penerbangan', cari, keterangan) != '0':
+            print('Harganya adalah: ' + str(self.cari_item(cari, keterangan)))
         else:
             print('Silakan Cari Dari Pilihan Yang Ada')
 
@@ -396,7 +405,7 @@ class Pembeli(Aplikasi):
         self.tampil_daftar('armada')
         cari = input('Silakan Masukkan Band Yang Ingin Anda Cari: ')  # Isinya Tv_Girl Atau Grrl Gen
         keterangan = input('Silakan Masukkan Member Yang Ingin Anda Cari: ')
-        if self.cari_item(cari, keterangan) != '0':
+        if self.cari_item('armada', cari, keterangan) != '0':
             print(f'{keterangan} : {self.cari_item(cari, keterangan)}')
         else:
             print('Silakan Cari Dari Pilihan Yang Ada')     
@@ -502,3 +511,9 @@ while start == True:
                     print('Harap Pilih Pilihan Yang Ada')
         else:
             print('Akun Tidak Ditemukan !')
+
+            masuk = input('Buat Akun (y/n) ?')
+
+            if masuk == 'y' :
+                aplikasi.buat_akun()
+            
