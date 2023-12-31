@@ -137,16 +137,6 @@ class Admin(Aplikasi):
         print('2. Edit Manager')
         print('3. Hapus Manger')
         print('4. Keluar')
-        opsi = int(input('Pilihan Kamu: '))
-
-        if opsi == 1:
-            self.tambah_data()
-        elif opsi == 2:
-            self.edit_data()
-        elif opsi == 3:
-            self.hapus_data()
-        else:
-            return False
 
     def tambah_data(self):
         print('Masukkan Data Manager Yang Mau Ditambah: ')
@@ -193,27 +183,6 @@ class Manager(Aplikasi):
         print('7. Tampilkan Daftar Pembeli')
         print('8. Tampilkan Total Penjualan dan Sisa Tiket')
         print('9. Keluar')
-        
-        pilihan = int(input('Masukkan Pilihan Kamu: '))
-
-        if pilihan == 1:
-            self.penerbangan()
-        elif pilihan == 2:
-            self.armada()
-        elif pilihan == 3:
-            self.ganti_data()
-        elif pilihan == 4:
-            self.tampil_data_penerbangan()
-        elif pilihan == 5:
-            self.tampil_data_band()
-        elif pilihan == 6:
-            self.tampil_tiket_terjual()
-        elif pilihan == 7:
-            self.tampil_daftar_pembeli()
-        elif pilihan == 8:
-            self.tampil_penjualan_sisa()
-        else:
-            return False
 
     def tampil_data(self, kategori_1, kategori_2):
         for key, value in database[kategori_1][kategori_2].items():
@@ -339,7 +308,7 @@ class Manager(Aplikasi):
         for band in database['armada']:
             for key, value in database['armada'][band].items():
                 if key == 'harga':
-                    print(f'{key}\t{value}')
+                    print(f'{band}\t{value}')
         print('Masukkan Band Yang Ingin Diganti Harganya:')
         band = input('Nama Band: ')
         harga_baru = int(input('Harga Baru: '))
@@ -393,16 +362,6 @@ class Pembeli(Aplikasi):
         print('2. Tampilkan Dan Cari Tiket')
         print('3. Pesan Tiket')
         print('4. Keluar')  
-        opsi = int(input('Masukkan Pilihan Kamu: '))
-
-        if opsi == 1:
-            self.tampil_daftar_dan_cari_penerbangan()
-        elif opsi == 2:
-            self.tampil_daftar_dan_cari_tiket()
-        elif opsi == 3:
-            self.pesan_tiket()
-        elif opsi == 4:
-            return False
         
     def tampil_daftar(self, cari):
         tipe = cari
@@ -464,9 +423,7 @@ class Pembeli(Aplikasi):
             database['pembeli'][band]['seat'].append(kelas)
             database['pembeli'][band]['jumlah'].append(jumlah)
 
-
 aplikasi = Aplikasi('', '', '', '')
-username, name, password,  = aplikasi.login(admin)
 
 start = True
 while start == True:
@@ -475,18 +432,73 @@ while start == True:
 
     if opsi == 1:
         username_admin, nama_admin, password_admin = aplikasi.login(admin)
-        while aplikasi.verifikasi(username_admin, nama_admin, password_admin):
-            admin = Admin(username_admin, nama_admin, password_admin, admin)
-            admin.main_menu()
+        if aplikasi.verifikasi(username_admin, nama_admin, password_admin):
+            while True:
+                admin = Admin(username_admin, nama_admin, password_admin, admin)
+                admin.main_menu()
+                pilihan = int(input('Masukkan Pilihan Kamu: '))
+
+                if pilihan == 1:
+                    admin.tambah_data()
+                elif pilihan == 2:
+                    admin.edit_data()
+                elif pilihan == 3:
+                    admin.hapus_data()
+                elif pilihan == 4:
+                    break
+                else:
+                    print('Pilih Silakan Pilih Pilihan Yang Ada')
+        else:
+            print('Akun Tidak Ditemukan !')
 
     elif opsi == 2:
         username_manager, nama_manager, password_manager = aplikasi.login(manager)
-        while aplikasi.verifikasi(username_manager, nama_manager, password_manager):
-            manager = Manager(username_manager, nama_manager, password_manager, manager)
-            manager.main_menu()
-            
+        if aplikasi.verifikasi(username_manager, nama_manager, password_manager):
+            while True:
+                manager = Manager(username_manager, nama_manager, password_manager, manager)
+                manager.main_menu() 
+                pilihan = int(input('Masukkan Pilihan Kamu: '))
+
+                if pilihan == 1:
+                    manager.penerbangan()
+                elif pilihan == 2:
+                    manager.armada()
+                elif pilihan == 3:
+                    manager.ganti_harga()
+                elif pilihan == 4:
+                    manager.tampil_data_penerbangan()
+                elif pilihan == 5:
+                    manager.tampil_data_band()
+                elif pilihan == 6:
+                    manager.tampil_tiket_terjual()
+                elif pilihan == 7:
+                    manager.tampil_daftar_pembeli()
+                elif pilihan == 8:
+                    manager.tampil_penjualan_sisa()
+                elif pilihan == 9:
+                    break
+                else:
+                    print('Harap Pilih Pilihan Yang Ada')
+        else:
+            print('Akun Tidak Ditemukan !')
+
     elif opsi == 3:
         username_buyer, nama_buyer, password_buyer = aplikasi.login(pembeli)
-        while aplikasi.verifikasi(username_buyer, nama_buyer, password_buyer):
-            buyer = Pembeli(username_buyer, nama_buyer, password_buyer, pembeli)
-            buyer.main_menu()
+        if aplikasi.verifikasi(username_buyer, nama_buyer, password_buyer):
+            while True:
+                buyer = Pembeli(username_buyer, nama_buyer, password_buyer, pembeli)
+                buyer.main_menu()
+                pilihan = int(input('Masukkan Pilihan Kamu: '))
+
+                if pilihan == 1:
+                    buyer.tampil_daftar_dan_cari_penerbangan()
+                elif pilihan == 2:
+                    buyer.tampil_daftar_dan_cari_tiket()
+                elif pilihan == 3:
+                    buyer.pesan_tiket()
+                elif pilihan == 4:
+                    break
+                else:
+                    print('Harap Pilih Pilihan Yang Ada')
+        else:
+            print('Akun Tidak Ditemukan !')
